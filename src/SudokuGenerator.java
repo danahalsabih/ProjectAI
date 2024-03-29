@@ -95,8 +95,8 @@ public class SudokuGenerator {
 
     private void removeCells() {
         Random random = new Random();
-        int minCellsToRemove = SIZE * SIZE / 2; // Minimum number of cells to remove
-        int maxCellsToRemove = (int) (SIZE * SIZE / 1.5); // Maximum number of cells to remove
+        int minCellsToRemove = 45; // Minimum number of cells to remove
+        int maxCellsToRemove = 55; // Maximum number of cells to remove
         int cellsToRemove = random.nextInt(maxCellsToRemove - minCellsToRemove + 1) + minCellsToRemove; // Number of cells to remove randomly choosen
         System.out.println(cellsToRemove);
         
