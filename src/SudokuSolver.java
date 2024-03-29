@@ -24,26 +24,26 @@ public class SudokuSolver {
             writer.newLine();
             printBoardToFile();
 
-            long startTime = System.nanoTime(); // start timer
+            long startTime = System.currentTimeMillis(); // start timer
 
             boolean isSolved = backtrackingAlgorthim(); // try to solve sudoku puzzle
 
             if (isSolved) {
 
-                long endTime = System.nanoTime();
+                long endTime = System.currentTimeMillis();
                 long duration = (endTime - startTime);
 
                 System.out.println("The Sudoku puzzle after solution: ");
                 printBoard();
-                System.out.println("Total time is " + duration + " nanoseconds.");
-                System.out.println("Sudoku solved in " + (duration - durationNotIncluded) + " nanoseconds.");
+                System.out.println("Total time is " + duration + " milliseconds.");
+                System.out.println("Sudoku solved in " + (duration - durationNotIncluded) + " milliseconds.");
 
                 writer.write("The Sudoku puzzle after solution: ");
                 writer.newLine();
                 printBoardToFile();
-                writer.write("Total time is " + duration + " nanoseconds.");
+                writer.write("Total time is " + duration + " milliseconds.");
                 writer.newLine();
-                writer.write("Sudoku solved in " + (duration - durationNotIncluded) + " nanoseconds.");
+                writer.write("Sudoku solved in " + (duration - durationNotIncluded) + " milliseconds.");
 
             } else {
                 System.out.println("No solution found.");
@@ -68,7 +68,7 @@ public class SudokuSolver {
         List<Integer> possibleValues = findPossibleValuesByLCV(row, col);
         for (int value : possibleValues) {
             board[row][col] = value;
-            long stopTime = System.nanoTime();
+            long stopTime = System.currentTimeMillis();
 
             System.out.println("Assign the value: " + value + " to cell that is in row: " + (row + 1) + " and column: "
                     + (col + 1));
@@ -84,14 +84,14 @@ public class SudokuSolver {
             }
 
             printBoardToFile();
-            long resumeTime = System.nanoTime();
+            long resumeTime = System.currentTimeMillis();
             durationNotIncluded += (resumeTime - stopTime);
 
             if (backtrackingAlgorthim()) {
                 return true; // Solution found
             }
 
-            stopTime = System.nanoTime();
+            stopTime = System.currentTimeMillis();
             // Backtrack
             System.out.println("Backtrack");
             try {
@@ -102,7 +102,7 @@ public class SudokuSolver {
                 e.printStackTrace();
             }
 
-            resumeTime = System.nanoTime();
+            resumeTime = System.currentTimeMillis();
             durationNotIncluded += (resumeTime - stopTime);
             board[row][col] = EMPTY;
         }
