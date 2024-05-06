@@ -1,3 +1,6 @@
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -6,16 +9,24 @@ public class SudokuSolverLocalSearch {
 
     private static final int DOMAIN = 9; // 1-9
     private static final int SUBGRID_SIZE = 3;
-    private static int[][] grid;
+    private static int[][] grid, originalGrid;
     private static long durationNotIncluded = 0;
+    private static BufferedWriter writer;
 
     public static void main(String[] args) {
         grid = SudokuGeneratorRandomly.generateSudoku();
-        while(!isSolved(grid)){
             durationNotIncluded=0;
             grid = SudokuGeneratorRandomly.generateSudoku();
+            originalGrid=grid;
             System.out.println("The Sudoku puzzle initially: ");
             printBoard();
+            try {
+                writer = new BufferedWriter(new FileWriter("sudoku_local_search.txt"));
+                writer.write("The Sudoku puzzle initially: ");
+                writer.newLine();
+                printBoardToFile();
+               
+
             long startTime = System.currentTimeMillis(); // start timer
             solveSudoku(grid);
             long endTime = System.currentTimeMillis();
@@ -26,19 +37,37 @@ public class SudokuSolverLocalSearch {
                 printBoard();
                 System.out.println("Total time is " + duration + " milliseconds.");
                 System.out.println("Sudoku solved in " + (duration - durationNotIncluded) + " milliseconds.");
+                writer.write("The Sudoku puzzle after solution: ");
+                writer.newLine();
+                printBoardToFile();
+                writer.write("Total time is " + duration + " milliseconds.");
+                writer.newLine();
+                writer.write("Sudoku solved in " + (duration - durationNotIncluded) + " milliseconds.");
+                
             }else{
-                System.out.println("\nNo sloution found");
+                System.out.println("\nNo solution found.");
                 System.out.println("Total time is " + duration + " milliseconds.");  
-            }
+                writer.write("No solution found.");
+            
         }
+        writer.close();
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
     
     }
 
     public static boolean solveSudoku(int[][] grid) {
         // Solve using min-conflicts heuristic
-        for (int Iteration = 1; Iteration <= 300; Iteration++) { // Set a maximum number of iterations
+        for (int Iteration = 1; Iteration <= 10000; Iteration++) { // Set a maximum number of iterations
             long stopTime = System.currentTimeMillis();
             System.out.println("Iteration:" + Iteration);
+            try {
+                writer.write("Iteration:" + Iteration);
+                writer.newLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             long resumeTime = System.currentTimeMillis();
             durationNotIncluded += (resumeTime - stopTime);
             if (isSolved(grid)) {
@@ -49,14 +78,29 @@ public class SudokuSolverLocalSearch {
             if (conflictedCell == null) {
                 // If no conflicted variable found, return false
                 stopTime = System.currentTimeMillis();
-                System.out.println("no conflictedCell");
+                System.out.println("No conflicted cell found.");
+                try {
+                    writer.write("No conflicted cell found.");
+                    writer.newLine();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 resumeTime = System.currentTimeMillis();
                 durationNotIncluded += (resumeTime - stopTime);
                 return false;
             }
             stopTime = System.currentTimeMillis();
             System.out.println("Conflicted cell: " + conflictedCell[0] + ", " + conflictedCell[1]);
-            System.out.println("countConflicts: "+countConflicts(grid, conflictedCell[0],conflictedCell[1]) );
+            int count=countConflicts(grid, conflictedCell[0],conflictedCell[1]);
+            System.out.println("Count conflicts: "+count );
+            try {
+                writer.write("Conflicted cell: " + conflictedCell[0] + ", " + conflictedCell[1]);
+                writer.newLine();
+                writer.write("Count conflicts: "+count);
+                writer.newLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             resumeTime = System.currentTimeMillis();
             durationNotIncluded += (resumeTime - stopTime);
             // Use the min-conflicts heuristic to find the appropriate value for the conflicted variable
@@ -66,14 +110,75 @@ public class SudokuSolverLocalSearch {
             System.out.println("Changing value at " + conflictedCell[0] + ", " + conflictedCell[1] + " to " + value);
             System.out.println("Updated Grid:");
             printBoard();
+            try {
+                writer.write("Changing value at " + conflictedCell[0] + ", " + conflictedCell[1] + " to " + value);
+                writer.newLine();
+                writer.write("Updated Grid:");
+                writer.newLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            printBoardToFile();
             resumeTime = System.currentTimeMillis();
             durationNotIncluded += (resumeTime - stopTime);
+
+            // Check if the solution is stuck and make swapping numbers to migrate the stuck
+            if (Iteration % 10 == 0 && !isProgress(grid)) {
+                stopTime = System.currentTimeMillis();
+                System.out.println("Stuck! Swapping two numbers.");
+                try {
+                    writer.write("Stuck! Swapping two numbers.");
+                    writer.newLine();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                resumeTime = System.currentTimeMillis();
+                durationNotIncluded += (resumeTime - stopTime);
+                swapNumbers(grid);
+            }
         }
         long stopTime = System.currentTimeMillis();
-        System.out.println("Sudoku not solved within 1000 iterations.");
+        System.out.println("Sudoku not solved within 10000 iterations.");
+        try {
+            writer.write("Sudoku not solved within 10000 iterations.");
+            writer.newLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         long resumeTime = System.currentTimeMillis();
         durationNotIncluded += (resumeTime - stopTime);
         return false; // Failed to solve within the maximum number of iterations
+    }
+
+    private static boolean isProgress(int[][] grid) {
+        // Compare the current grid with the original grid to check for changes
+        for (int i = 0; i < DOMAIN; i++) {
+            for (int j = 0; j < DOMAIN; j++) {
+                if (grid[i][j] != originalGrid[i][j]) {
+                    originalGrid=grid;
+                    return true; // Progress made
+                }
+            }
+        }
+        return false; // No progress made
+    }
+
+    private static void swapNumbers(int[][] grid) {
+        // Randomly select two different cells and swap their values
+        Random random = new Random();
+        int row1 = random.nextInt(DOMAIN);
+        int col1 = random.nextInt(DOMAIN);
+        int row2 = random.nextInt(DOMAIN);
+        int col2 = random.nextInt(DOMAIN);
+        while (row1 == row2 && col1 == col2) {
+            // Ensure that the two cells are different for swapping
+            row2 = random.nextInt(DOMAIN);
+            col2 = random.nextInt(DOMAIN);
+        }
+        // Swap the 2 values
+        int temp = grid[row1][col1];
+        grid[row1][col1] = grid[row2][col2];
+        grid[row2][col2] = temp;
     }
 
     private static boolean isSolved(int[][] grid) {
@@ -161,8 +266,21 @@ public class SudokuSolverLocalSearch {
         if (!conflictedCells.isEmpty()) {
             long stopTime = System.currentTimeMillis();
             System.out.println("Conflicted cells:");
+            try {
+                writer.write("Conflicted cells:");
+                writer.newLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            
             for (int[] cell : conflictedCells) {
                 System.out.println(cell[0] + ", " + cell[1]);
+                try {
+                    writer.write(cell[0] + ", " + cell[1]);
+                    writer.newLine();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
             long resumeTime = System.currentTimeMillis();
             durationNotIncluded += (resumeTime - stopTime);
@@ -213,6 +331,12 @@ public class SudokuSolverLocalSearch {
         if (!validValues.isEmpty()) {
             long stopTime = System.currentTimeMillis();
             System.out.println("No value can minumize conflicts");
+            try {
+                writer.write("No value can minumize conflicts");
+                writer.newLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             long resumeTime = System.currentTimeMillis();
             durationNotIncluded += (resumeTime - stopTime);
             Random rand = new Random();
@@ -266,5 +390,23 @@ public class SudokuSolverLocalSearch {
         System.out.println("********************");
         System.out.println();
     }
-    
+    private static void printBoardToFile() {
+        try {
+            for (int i = 0; i < DOMAIN; i++) {
+                for (int j = 0; j < DOMAIN; j++) {
+                    if (j == 0)
+                        writer.write("|");
+                    writer.write(grid[i][j] + " ");
+                    if (j == 8)
+                        writer.write("|");
+                }
+                writer.newLine();
+            }
+            writer.write("********************");
+            writer.newLine();
+            writer.newLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
