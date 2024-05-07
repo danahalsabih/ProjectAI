@@ -20,8 +20,6 @@ public class SudokuSolverLocalSearch {
         grid=fillRemainingRandomly(grid);
                 originalGrid=grid;
             durationNotIncluded=0;
-            grid = SudokuGeneratorRandomly.generateSudoku();
-            originalGrid=grid;
             System.out.println("The Sudoku puzzle initially: ");
             printBoard();
             try {
