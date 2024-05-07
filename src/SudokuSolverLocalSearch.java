@@ -14,7 +14,11 @@ public class SudokuSolverLocalSearch {
     private static BufferedWriter writer;
 
     public static void main(String[] args) {
-        grid = SudokuGeneratorRandomly.generateSudoku();
+        SudokuGenerator generator = new SudokuGenerator(); // create a SudokuGenerator instance
+        generator.generate(); // generate a Sudoku puzzle
+        grid = generator.getGrid();// get grid puzzle
+        grid=fillRemainingRandomly(grid);
+                originalGrid=grid;
             durationNotIncluded=0;
             grid = SudokuGeneratorRandomly.generateSudoku();
             originalGrid=grid;
@@ -56,6 +60,43 @@ public class SudokuSolverLocalSearch {
     }
     
     }
+    private static int[][] fillRemainingRandomly(int[][] grid) { //complete fo
+        int[][] filledGrid = grid;
+
+        for (int i = 0; i < DOMAIN; i++) { // Iterate through each row
+            List<Integer> emptyCells = new ArrayList<>(); // Store indices of empty cells in this row
+            for (int j = 0; j < DOMAIN; j++) { // Iterate through each column
+                if (grid[i][j] == 0) { // If the cell is empty
+                    emptyCells.add(j); // Add the index of the empty cell to the list
+                }
+            }
+
+            List<Integer> remainingValues = new ArrayList<>(); // Store remaining values to be placed
+            for (int num = 1; num <= DOMAIN; num++) {
+                if (!containsValue(grid[i], num)) { // If the number is not already in the row
+                    remainingValues.add(num); // Add it to the list of remaining values
+                }
+            }
+
+            Random random = new Random();
+            for (int emptyCellIndex : emptyCells) { // Iterate through empty cells in the row
+                int randomIndex = random.nextInt(remainingValues.size()); // Choose a random index from the remaining values
+                filledGrid[i][emptyCellIndex] = remainingValues.get(randomIndex); // Assign the value to the empty cell
+                remainingValues.remove(randomIndex); // Remove the assigned value from the list of remaining values
+            }
+        }
+        return filledGrid;
+    }
+
+    private static boolean containsValue(int[] array, int value) {
+        for (int num : array) {
+            if (num == value) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     public static boolean solveSudoku(int[][] grid) {
         // Solve using min-conflicts heuristic
