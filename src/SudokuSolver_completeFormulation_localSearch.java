@@ -20,12 +20,11 @@ public class SudokuSolver_completeFormulation_localSearch {
         printBoard();
         long startTime = System.currentTimeMillis(); // start timer
         simulatedAnnealing();
-
+        long endTime = System.currentTimeMillis();
         if (isSolved(board)) {
+            long duration = (endTime - startTime);
             System.out.println("Sudoku solved!");
-            long endTime = System.currentTimeMillis();
-        long duration = (endTime - startTime);
-        System.out.println("Total time is " + duration + " milliseconds.");
+            System.out.println("Total time is " + duration + " milliseconds.");
         } else {
             System.out.println("No solution found within constraints.");
         }
@@ -242,17 +241,17 @@ public class SudokuSolver_completeFormulation_localSearch {
     }
 
     private int calculateDeltaE(int row1, int col1, int row2, int col2){
-        int conflictsBefore = countConflicts();
+        int conflictsAfter = countConflicts();
         // Swap back to calculate conflicts after
         int tempVal = board[row1][col1];
         board[row1][col1] = board[row2][col2];
         board[row2][col2] = tempVal;
-        int conflictsAfter = countConflicts();
+        int conflictsBefore = countConflicts();
 
         tempVal = board[row1][col1];
         board[row1][col1] = board[row2][col2];
         board[row2][col2] = tempVal; // Revert the swap again
-        return conflictsAfter - conflictsBefore;
+        return conflictsBefore - conflictsAfter;
     }
 
     private int countConflicts() {
