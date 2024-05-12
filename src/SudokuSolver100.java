@@ -4,9 +4,9 @@ public class SudokuSolver100 {
 
     private static final int SIZE = 9;
     private static final int BOX_SIZE = 3;
-    private static final double INITIAL_TEMPERATURE = 100; // Increased for more exploration
-    private static final double COOLING_RATE = 0.90; // Slower cooling for better escape from optima
-    private static final int MAX_ITERATIONS = 5000; // Doubled iterations
+    private static final double INITIAL_TEMPERATURE = 100;
+    private static final double COOLING_RATE = 0.90; // Slower cooling
+    private static final int MAX_ITERATIONS = 1000; 
 
     private final int[][] board;
 
@@ -15,7 +15,7 @@ public class SudokuSolver100 {
     }
 
     public void solve() {
-       // generateValidInitialState(); // Generate guaranteed valid initial state
+        generateValidInitialState(); // Generate guaranteed valid initial state
         printBoard();
         fillRemainingRandomly();
         printBoard();
@@ -132,39 +132,6 @@ public class SudokuSolver100 {
         return false;
     }
 
-
-    private boolean isRowValid(int row, int num) {
-        Set<Integer> set = new HashSet<>();
-        for (int col = 0; col < SIZE; col++) {
-            if (board[row][col] != 0 && !set.add(board[row][col])) {
-                return false; // Duplicate number found
-            }
-        }
-        return true;
-    }
-
-    private boolean isColumnValid(int col, int num) {
-        Set<Integer> set = new HashSet<>();
-        for (int row = 0; row < SIZE; row++) {
-            if (board[row][col] != 0 && !set.add(board[row][col])) {
-                return false; // Duplicate number found
-            }
-        }
-        return true;
-    }
-
-    private boolean isBoxValid(int startRow, int startCol, int num) {
-        Set<Integer> set = new HashSet<>();
-        for (int row = startRow; row < startRow + BOX_SIZE; row++) {
-            for (int col = startCol; col < startCol + BOX_SIZE; col++) {
-                if (board[row][col] != 0 && !set.add(board[row][col])) {
-                    return false; // Duplicate number found
-                }
-            }
-        }
-        return true;
-    }
-
     private static boolean isSolved(int[][] grid) {
         // Check rows
         for (int row = 0; row < SIZE; row++) {
@@ -260,7 +227,7 @@ public class SudokuSolver100 {
                     int deltaE = calculateDeltaE(row1, col1, row2, col2);
 
                     double probability = Math.exp(-deltaE / temperature);
-                    if (deltaE >= 0   || Math.random() > Math.exp(-deltaE / temperature)) {
+                    if (deltaE >= 0  || Math.random() > probability) {
                         continue;
                     } else {
                         // Revert swap if not accepted
