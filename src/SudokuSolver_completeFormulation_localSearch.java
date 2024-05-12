@@ -242,7 +242,7 @@ public class SudokuSolver_completeFormulation_localSearch {
 
     private int calculateDeltaE(int row1, int col1, int row2, int col2){
         int conflictsAfter = countConflicts();
-        // Swap back to calculate conflicts after
+        // Swap back to calculate conflicts before.
         int tempVal = board[row1][col1];
         board[row1][col1] = board[row2][col2];
         board[row2][col2] = tempVal;
