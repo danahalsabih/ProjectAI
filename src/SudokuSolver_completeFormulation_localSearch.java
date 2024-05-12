@@ -1,16 +1,15 @@
 import java.util.*;
 
-public class SudokuSolver100 {
+public class SudokuSolver_completeFormulation_localSearch {
 
     private static final int SIZE = 9;
     private static final int BOX_SIZE = 3;
-    private static final double INITIAL_TEMPERATURE = 100;
-    private static final double COOLING_RATE = 0.90; // Slower cooling
-    private static final int MAX_ITERATIONS = 1000; 
+    private static final double INITIAL_TEMPERATURE = 90000;
+    private static final double COOLING_RATE = 0.9999; // Slower cooling
 
     private final int[][] board;
 
-    public SudokuSolver100() {
+    public SudokuSolver_completeFormulation_localSearch() {
         this.board = new int[SIZE][SIZE];
     }
 
@@ -31,7 +30,6 @@ public class SudokuSolver100 {
             System.out.println("No solution found within constraints.");
         }
 
-        // Print the solved puzzle (if any)
         printBoard();
     }
 
@@ -48,9 +46,9 @@ public class SudokuSolver100 {
         // Random number generator
         Random random = new Random();
 
-        // Fill 20 random cells with valid numbers
+        // Fill 15 random cells with valid numbers
         int filledCells = 0;
-        while (filledCells < 20) {
+        while (filledCells < 15) {
             int row = random.nextInt(SIZE);
             int col = random.nextInt(SIZE);
             int num = random.nextInt(SIZE) + 1; // Generate numbers 1 to 9
@@ -133,14 +131,6 @@ public class SudokuSolver100 {
     }
 
     private static boolean isSolved(int[][] grid) {
-        // Check rows
-        for (int row = 0; row < SIZE; row++) {
-            for (int col = 0; col < SIZE; col++) {
-                if (!isValidRow(grid,row,col)) {
-                    return false;
-                }
-            }
-        }
         
         // Check columns
         for (int col = 0; col < SIZE; col++) {
@@ -155,6 +145,14 @@ public class SudokuSolver100 {
         for (int startRow = 0; startRow < SIZE; startRow += 3) {
             for (int startCol = 0; startCol < SIZE; startCol += 3) {
                 if (!isValidSubgrid(grid, startRow, startCol)) {
+                    return false;
+                }
+            }
+        }
+        // Check rows
+        for (int row = 0; row < SIZE; row++) {
+            for (int col = 0; col < SIZE; col++) {
+                if (!isValidRow(grid,row,col)) {
                     return false;
                 }
             }
@@ -209,11 +207,12 @@ public class SudokuSolver100 {
 
     private void simulatedAnnealing() {
         double temperature = INITIAL_TEMPERATURE;
-        for (int iter = 0; iter < MAX_ITERATIONS; iter++) {
-            if (isSolved(board)) {
+        int iter=0;
+        while(temperature>1){
+            if(iter%10==0 && isSolved(board)) {
                 return;
             }
-            for (int i = 0; i < SIZE * SIZE; i++) {
+            iter++;
                 int row1 = (int) (Math.random() * SIZE);
                 int col1 = (int) (Math.random() * SIZE);
                 int row2 = (int) (Math.random() * SIZE);
@@ -237,7 +236,7 @@ public class SudokuSolver100 {
                         
                     }
                 
-            }
+            
             temperature *= COOLING_RATE;
         }
     }
@@ -301,7 +300,7 @@ public class SudokuSolver100 {
 
 
     public static void main(String[] args) {
-        SudokuSolver100 solver = new SudokuSolver100();
+        SudokuSolver_completeFormulation_localSearch solver = new SudokuSolver_completeFormulation_localSearch();
         solver.solve();
     }
 
