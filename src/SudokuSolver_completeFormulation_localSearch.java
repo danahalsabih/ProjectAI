@@ -48,9 +48,9 @@ public class SudokuSolver_completeFormulation_localSearch {
         // Random number generator
         Random random = new Random();
 
-        // Fill 20 random cells with valid numbers
+        // Fill 15 random cells with valid numbers
         int filledCells = 0;
-        while (filledCells < 20) {
+        while (filledCells < 15) {
             int row = random.nextInt(SIZE);
             int col = random.nextInt(SIZE);
             int num = random.nextInt(SIZE) + 1; // Generate numbers 1 to 9
