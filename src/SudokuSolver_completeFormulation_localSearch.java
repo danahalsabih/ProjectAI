@@ -1,6 +1,6 @@
 import java.util.*;
 
-public class SudokuSolver100 {
+public class SudokuSolver_completeFormulation_localSearch {
 
     private static final int SIZE = 9;
     private static final int BOX_SIZE = 3;
@@ -10,7 +10,7 @@ public class SudokuSolver100 {
 
     private final int[][] board;
 
-    public SudokuSolver100() {
+    public SudokuSolver_completeFormulation_localSearch() {
         this.board = new int[SIZE][SIZE];
     }
 
@@ -301,7 +301,7 @@ public class SudokuSolver100 {
 
 
     public static void main(String[] args) {
-        SudokuSolver100 solver = new SudokuSolver100();
+        SudokuSolver_completeFormulation_localSearch solver = new SudokuSolver_completeFormulation_localSearch();
         solver.solve();
     }
 
