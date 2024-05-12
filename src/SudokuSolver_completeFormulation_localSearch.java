@@ -4,8 +4,8 @@ public class SudokuSolver_completeFormulation_localSearch {
 
     private static final int SIZE = 9;
     private static final int BOX_SIZE = 3;
-    private static final double INITIAL_TEMPERATURE = 80000;
-    private static final double COOLING_RATE = 0.01; // Slower cooling
+    private static final double INITIAL_TEMPERATURE = 90000;
+    private static final double COOLING_RATE = 0.9999; // Slower cooling
 
     private final int[][] board;
 
@@ -46,9 +46,9 @@ public class SudokuSolver_completeFormulation_localSearch {
         // Random number generator
         Random random = new Random();
 
-        // Fill 45 random cells with valid numbers
+        // Fill 15 random cells with valid numbers
         int filledCells = 0;
-        while (filledCells < 45) {
+        while (filledCells < 15) {
             int row = random.nextInt(SIZE);
             int col = random.nextInt(SIZE);
             int num = random.nextInt(SIZE) + 1; // Generate numbers 1 to 9
@@ -208,7 +208,7 @@ public class SudokuSolver_completeFormulation_localSearch {
     private void simulatedAnnealing() {
         double temperature = INITIAL_TEMPERATURE;
         int iter=0;
-        while(INITIAL_TEMPERATURE>1){
+        while(temperature>1){
             if(iter%10==0 && isSolved(board)) {
                 return;
             }
